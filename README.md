@@ -2,6 +2,7 @@
 
 A lightweight, interactive web application for calculating key aircraft performance metrics across various altitudes. Built with **Streamlit**, it visualizes how thrust and power parameters behave in different flight conditions.
 
+## Try it from here, https://aircraftpcl.streamlit.app/
 ---
 
 ## 📖 Overview
