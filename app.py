@@ -81,7 +81,7 @@ def calculate_performance(altitude):
         'Excess Power (MW)': ep
     }
 
-st.title("Aircraft Performance Calculator")
+st.title("Aircraft Performance Calculator \n By Amr Ashraf Mohamed")
 
 # Single Altitude Prediction
 st.header("Single Altitude Prediction")
