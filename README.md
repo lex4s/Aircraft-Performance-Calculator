@@ -1,13 +1,13 @@
 # ✈️ Aircraft Performance Calculator
 
-A lightweight, interactive web application for calculating key aircraft performance metrics across various altitudes. Built with **Streamlit**, it visualizes how thrust and power parameters behave in different flight conditions .
+A sleek, interactive web application engineered for precise calculation of essential aircraft performance metrics across varying altitudes. Powered by **Streamlit**, this tool now incorporates user-defined True Airspeed and Weight, offering a more nuanced analysis of flight dynamics.
 
-## Try it from here, https://aircraftpcl.streamlit.app/
+## Check it out here, https://aircraftpcl.streamlit.app/
 ---
 
 ## 📖 Overview
 
-This project computes and plots aircraft performance metrics such as:
+This project meticulously computes critical aircraft performance metrics, now enhanced with True Airspeed and Weight considerations:
 - **Thrust Available (N)**
 - **Thrust Required (N)**
 - **Excess Thrust (N)**
@@ -15,26 +15,25 @@ This project computes and plots aircraft performance metrics such as:
 - **Power Required (MW)**
 - **Excess Power (MW)**
 
-It uses piecewise linear interpolation to estimate performance values based on user-defined altitudes.
+It leverages piecewise linear interpolation to accurately estimate performance values based on user-specified altitudes, True Airspeed, and Aircraft Weight.
 
 ---
 
 ## 🎯 Features
 
-- 📊 **Real-time plotting** of thrust and power curves vs. altitude  
-- 🔢 **Single and multiple altitude predictions**  
-- 📋 **Tabular display of results**  
-- 🖥️ **Runs entirely in your browser** using Streamlit  
+- 🔢 **Comprehensive Single and Multiple Altitude Predictions:** Analyze performance at specific altitudes or across a range.
+- ⚙️ **Integrated True Airspeed and Weight Inputs:** Achieve more precise calculations by factoring in these crucial parameters.
+- 📋 **Clear Tabular Display of Results:** Review all calculated metrics in an organized, easy-to-understand table.
+- 🖥️ **Seamless In-Browser Operation:** Runs smoothly within your web browser, thanks to Streamlit.
 
 ---
 
 ## 🛠️ Tech Stack
 
 - **Python 3.x**
-- **Streamlit** (for the web interface)
-- **Matplotlib** (for graph plotting)
-- **NumPy**
-- **Pandas**
+- **Streamlit** (for the intuitive web interface)
+- **NumPy** (for efficient numerical operations)
+- **Pandas** (for structured data handling and tabular displays)
 
 ---
 
@@ -42,58 +41,5 @@ It uses piecewise linear interpolation to estimate performance values based on u
 
 1. **Clone the repository**
    ```bash
-   git clone https://github.com/lex4s/Aircraft-Performance-Calculator.git
+   git clone [https://github.com/lex4s/Aircraft-Performance-Calculator.git](https://github.com/lex4s/Aircraft-Performance-Calculator.git)
    cd Aircraft-Performance-Calculator
-   ```
-
-2. **(Optional) Create a virtual environment**
-   ```bash
-   python -m venv venv
-   source venv/bin/activate  # On Windows: venv\Scripts\activate
-   ```
-
-3. **Install dependencies**
-   ```bash
-   pip install -r requirements.txt
-   ```
-
-4. **Run the application**
-   ```bash
-   streamlit run app.py
-   ```
-
----
-
-## 📊 How It Works
-
-- Adjust the **altitude slider** or enter multiple altitudes.
-- Click **Calculate** to get performance metrics.
-- View results in both tabular and graphical forms.
-- Graphs show:
-  - Thrust Available / Required and Excess Thrust  
-  - Power Available / Required and Excess Power  
-
----
-
-## 📌 Project Status
-
-✅ **Current**: Working, tested, and clean interface.  
-🔜 **Planned**:
-- Aircraft database integration  
-- Export to CSV / PDF  
-- Configurable performance profiles  
-
----
-
-## 📄 License
-
-This project is licensed under the [MIT License](LICENSE).
-
----
-
-## 📬 Contact
-
-**[Amr Ashraf]** – [elhadidy169@gmail.com]  
-GitHub: [https://github.com/lex4s](https://github.com/lex4s)
-
----
