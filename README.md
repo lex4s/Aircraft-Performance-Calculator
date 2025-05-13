@@ -3,7 +3,7 @@
 
 An interactive and accurate web application for calculating essential aircraft performance metrics across different altitudes and speeds. Powered by **Streamlit**, it now integrates advanced aerodynamic modeling with user-defined aircraft parameters for a deeper and more dynamic analysis.
 
-👉 **Check it out live:** [https://aircraftpcl.streamlit.app/](https://aerocalc.streamlit.app/)
+👉 **Check it out live:** [https://aerocalc.streamlit.app/](https://aerocalc.streamlit.app/)
 
 ---
 
