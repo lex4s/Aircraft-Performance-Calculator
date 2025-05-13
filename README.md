@@ -1,39 +1,47 @@
+
 # ✈️ Aircraft Performance Calculator
 
-A sleek, interactive web application engineered for precise calculation of essential aircraft performance metrics across varying altitudes. Powered by **Streamlit**, this tool now incorporates user-defined True Airspeed and Weight, offering a more nuanced analysis of flight dynamics.
+An interactive and accurate web application for calculating essential aircraft performance metrics across different altitudes and speeds. Powered by **Streamlit**, it now integrates advanced aerodynamic modeling with user-defined aircraft parameters for a deeper and more dynamic analysis.
 
-## Check it out here, https://aircraftpcl.streamlit.app/
+👉 **Check it out live:** [https://aircraftpcl.streamlit.app/](https://aircraftpcl.streamlit.app/)
+
 ---
 
 ## 📖 Overview
 
-This project meticulously computes critical aircraft performance metrics, now enhanced with True Airspeed and Weight considerations:
+This project precisely computes key aircraft performance parameters, factoring in real-time user inputs for **True Airspeed**, **Weight**, **Wing Span**, **Aspect Ratio**, and **Oswald Efficiency Factor**. It dynamically evaluates:
+
 - **Thrust Available (N)**
 - **Thrust Required (N)**
 - **Excess Thrust (N)**
 - **Power Available (MW)**
 - **Power Required (MW)**
 - **Excess Power (MW)**
+- **Lift Coefficient (C_L)**
+- **Induced Drag Coefficient (C_D_induced)**
+- **Parasite Drag Coefficient (C_D_parasite)**
+- **Total Drag Coefficient (C_D)**
 
-It leverages piecewise linear interpolation to accurately estimate performance values based on user-specified altitudes, True Airspeed, and Aircraft Weight.
+It uses **polynomial fitting** to estimate Parasite Drag Coefficient as a function of altitude based on empirical chart data, offering refined accuracy across varying altitudes.
 
 ---
 
 ## 🎯 Features
 
-- 🔢 **Comprehensive Single and Multiple Altitude Predictions:** Analyze performance at specific altitudes or across a range.
-- ⚙️ **Integrated True Airspeed and Weight Inputs:** Achieve more precise calculations by factoring in these crucial parameters.
-- 📋 **Clear Tabular Display of Results:** Review all calculated metrics in an organized, easy-to-understand table.
-- 🖥️ **Seamless In-Browser Operation:** Runs smoothly within your web browser, thanks to Streamlit.
+- 🔢 **Real-Time Performance Predictions:** Adjust altitude, speed, weight, and aerodynamic parameters on the fly.
+- 📈 **Polynomial Parasite Drag Modeling:** Calculates C_D_parasite from altitude using a curve-fitted model.
+- ⚙️ **Detailed Aerodynamic Breakdown:** Live display of lift, drag coefficients, and induced vs parasite drag contributions.
+- 🔍 **Comparison with Reference Chart Values:** See how your calculated Thrust and Power Required stack up against empirical chart data.
+- 🖥️ **Seamless Browser Operation:** All computations and visualizations run smoothly within your browser via Streamlit.
 
 ---
 
 ## 🛠️ Tech Stack
 
 - **Python 3.x**
-- **Streamlit** (for the intuitive web interface)
-- **NumPy** (for efficient numerical operations)
-- **Pandas** (for structured data handling and tabular displays)
+- **Streamlit**
+- **NumPy**
+- **SciPy**
 
 ---
 
@@ -41,5 +49,17 @@ It leverages piecewise linear interpolation to accurately estimate performance v
 
 1. **Clone the repository**
    ```bash
-   git clone [https://github.com/lex4s/Aircraft-Performance-Calculator.git](https://github.com/lex4s/Aircraft-Performance-Calculator.git)
+   git clone https://github.com/lex4s/Aircraft-Performance-Calculator.git
    cd Aircraft-Performance-Calculator
+   ```
+
+2. **Install dependencies**
+   ```bash
+   pip install -r requirements.txt
+   ```
+
+3. **Run the app**
+   ```bash
+   streamlit run app.py
+   ```
+##### Developed by Amr Ashraf
