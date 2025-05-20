@@ -1,121 +1,127 @@
 import streamlit as st
-import numpy as np
-from scipy.optimize import curve_fit
+import math
 
-# Chart data
-chart_data = {
-    0: {"TA": 50000, "PA": 20e6, "TR": 10000, "PR": 4e6, "excess_thrust": 40000, "excess_power": 16e6},
-    2000: {"TA": 40000, "PA": 16e6, "TR": 9800, "PR": 3.9e6, "excess_thrust": 30200, "excess_power": 12.1e6},
-    5000: {"TA": 25000, "PA": 10e6, "TR": 9500, "PR": 3.8e6, "excess_thrust": 15500, "excess_power": 6.2e6},
-    8000: {"TA": 10000, "PA": 4e6, "TR": 9300, "PR": 3.7e6, "excess_thrust": 700, "excess_power": 0.3e6},
-    10000: {"TA": 5000, "PA": 2e6, "TR": 9200, "PR": 3.6e6, "excess_thrust": -4200, "excess_power": -1.6e6}
-}
+# --- Constants ---
+# Standard air crap at sea level
+rho_sl = 1.225      # kg/m^3
 
-default_weight = 50000.0  # N
-default_wing_span = 7.32  # m
-default_aspect_ratio = 7.0
-default_oswald_efficiency = 0.8
+# Kinda how high the air thins out. It's approximate, don't freak out.
+h_scale = 8500.0      # m
 
-# Function to estimate air density based on altitude
-def get_air_density(altitude):
-    rho_0 = 1.225
-    return rho_0 * np.exp(-altitude / 8000)
+# Gravity... yeah, it pulls stuff down. Not directly used right now, but good to know.
+g = 9.80665          # m/s^2
 
-# Streamlit UI - Title and Inputs
-st.title("Aerodynamic Calculator")
-st.title("**By Amr Ashraf**")
+# --- Helper Function ---
+def calc_rho(alt_m: float) -> float:
+    """Figure out how thick the air is way up there using a simple model."""
+    return rho_sl * math.exp(-alt_m / h_scale)
 
-st.header("Input Parameters")
-reference_velocity = st.number_input("Reference Velocity for CD_parasite Fit (m/s)", min_value=100.0, max_value=3000.0, value=400.0, step=10.0)
-altitude = st.slider("Altitude (meters)", 0, 10000, 0, step=100)
-weight = st.number_input("Weight (N)", min_value=10000.0, max_value=10000000.0, value=default_weight, step=1000.0)
-velocity = st.number_input("Velocity (m/s)", min_value=100.0, max_value=3000.0, value=reference_velocity, step=10.0)
-wing_span = st.number_input("Wing Span (m)", min_value=1.0, max_value=50.0, value=default_wing_span, step=0.1)
-aspect_ratio = st.number_input("Aspect Ratio (AR)", min_value=1.0, max_value=20.0, value=default_aspect_ratio, step=0.1)
-oswald_efficiency = st.slider("Oswald Efficiency Factor (e)", 0.7, 0.9, default_oswald_efficiency, step=0.01)
+# --- Streamlit App Starts Here ---
+st.title("Aircraft Performance Quick Check")
+st.write("Punch in the deets, see what this bird's doing.")
 
-# Wing Area
-S = (wing_span ** 2) / aspect_ratio
+st.subheader("Input Parameters")
+st.write("Tell me about the plane and the situation.")
 
-# Prepare CD_parasite values for curve fit
-altitudes_chart = sorted(chart_data.keys())
-cd_parasite_values = []
+# Layout inputs side-by-side
+col1, col2 = st.columns(2)
 
-for alt in altitudes_chart:
-    rho = get_air_density(alt)
-    TR_chart = chart_data[alt]["TR"]
-    dynamic_pressure = 0.5 * rho * (reference_velocity ** 2)
-    CL = default_weight / (dynamic_pressure * S)
-    CD_induced = (CL ** 2) / (np.pi * aspect_ratio * oswald_efficiency)
-    CD_total_required = TR_chart / (dynamic_pressure * S)
-    CD_parasite = CD_total_required - CD_induced
-    cd_parasite_values.append(max(0, CD_parasite))
+with col1:
+    # How much lift the wing's making right now
+    cl = st.number_input("Coefficient of Lift (CL)", min_value=0.001, max_value=2.5, value=0.3, format="%.3f")
+    # How much drag is fighting ya
+    cd = st.number_input("Coefficient of Drag (CD)", min_value=0.001, max_value=1.0, value=0.03, format="%.4f")
+    # Wingtip to wingtip distance
+    span_m = st.number_input("Wing Span (m)", min_value=0.1, value=10.0, format="%.2f")
+    # Wing shape-ish parameter
+    ar = st.number_input("Aspect Ratio (AR)", min_value=0.1, value=7.0, format="%.2f")
 
-# Polynomial fit function
-def cd_parasite_model(h, a, b, c):
-    return a * h**2 + b * h + c
+with col2:
+    # How heavy this beast is (in Newtons, not pounds, 'cause we're fancy)
+    weight_n = st.number_input("Aircraft Weight (N)", min_value=1.0, value=10000.0, format="%.2f")
+    # How fast it's hauling ass (meters per second)
+    v_mps = st.number_input("Velocity (m/s)", min_value=0.1, value=50.0, format="%.2f")
+    # How high off the ground it is
+    alt_m = st.number_input("Altitude (m)", min_value=0.0, value=1000.0, format="%.1f")
+    # Max grunt the engine gives ya parked at sea level
+    thrust_sl_n = st.number_input("Max Static Thrust (Sea Level, N)", min_value=0.1, value=2500.0, format="%.2f")
 
-# Curve fit
-popt, pcov = curve_fit(cd_parasite_model, altitudes_chart, cd_parasite_values, p0=[0, 0, 0.02])
+st.markdown("---") # Little line to break things up
 
-# Function to get CD_parasite at any altitude
-def get_cd_parasite(altitude):
-    return max(0.0001, cd_parasite_model(altitude, *popt))
+# --- Calculations ---
+# Okay, time to crunch some numbers based on your inputs.
 
-# Calculate air density
-rho = get_air_density(altitude)
+# Air density at this altitude
+rho = calc_rho(alt_m)
 
-# Calculate CL
-dynamic_pressure = 0.5 * rho * velocity ** 2
-CL = weight / (dynamic_pressure * S)
+# Get the wing area. If AR is zero you're doing something wrong, but the input widget handles that.
+wing_area = span_m**2 / ar # S = b^2 / AR
 
-# Calculate drag coefficients
-CD_induced = (CL ** 2) / (np.pi * aspect_ratio * oswald_efficiency)
-CD_parasite_calculated = get_cd_parasite(altitude)
-CD_total = CD_parasite_calculated + CD_induced
+# That force of smacking into the air
+q = 0.5 * rho * v_mps**2 # Dynamic pressure
 
-# Total Drag and Power Required
-total_drag = dynamic_pressure * S * CD_total
-power_required_calculated = total_drag * velocity
+# Total lift the wings are generating based on CL
+lift_n = q * wing_area * cl # L = q * S * CL
 
-# Interpolation for Available Thrust and Power
-def interpolate_chart(altitude, param):
-    altitudes = sorted(chart_data.keys())
-    values = [chart_data[alt][param] for alt in altitudes]
-    if altitude <= altitudes[0]: return values[0]
-    if altitude >= altitudes[-1]: return values[-1]
-    for i in range(len(altitudes) - 1):
-        if altitudes[i] <= altitude <= altitudes[i + 1]:
-            frac = (altitude - altitudes[i]) / (altitudes[i + 1] - altitudes[i])
-            return values[i] + frac * (values[i + 1] - values[i])
-    return None
+# Drag, man. That's the thrust you gotta fight.
+thrust_req_n = q * wing_area * cd # Thrust Required = Drag = q * S * CD
 
-TA = interpolate_chart(altitude, "TA")
-PA = interpolate_chart(altitude, "PA")
-TR_chart_ref = interpolate_chart(altitude, "TR")
-PR_chart_ref = interpolate_chart(altitude, "PR")
+# Power needed just to push through the air at this speed
+power_req_w = thrust_req_n * v_mps # Pr = Tr * V
 
-# Excess values
-excess_thrust = TA - total_drag
-excess_power = PA - power_required_calculated
+# Simple model for how much thrust the engine is giving you up here (scales with density)
+thrust_avail_n = thrust_sl_n * (rho / rho_sl)
 
-# Display Results
-st.header("Calculated Parameters")
-st.write(f"**Lift Coefficient (C_L)**: {CL:.4f}")
-st.write(f"**Induced Drag Coefficient (C_D_induced)**: {CD_induced:.4f}")
-st.write(f"**Parasite Drag Coefficient (C_D_parasite)**: {CD_parasite_calculated:.4f}")
-st.write(f"**Total Drag Coefficient (C_D)**: {CD_total:.4f}")
-st.write(f"**Weight (W)**: {weight:.1f} N")
-st.write(f"**Velocity (V)**: {velocity:.1f} m/s")
-st.write(f"**Wing Area (S)**: {S:.2f} m²")
-st.write(f"**Aspect Ratio (AR)**: {aspect_ratio:.2f}")
+# Engine power output at this speed
+power_avail_w = thrust_avail_n * v_mps # Pa = Ta * V
 
-st.header("Thrust and Power Results")
-st.write(f"**Thrust Required (Calculated)**: {total_drag:.1f} N")
-st.write(f"**Thrust Required (from Chart at this Altitude)**: {TR_chart_ref:.1f} N")
-st.write(f"**Power Required (Calculated)**: {power_required_calculated/1e6:.2f} MW")
-st.write(f"**Power Required (from Chart at this Altitude)**: {PR_chart_ref/1e6:.2f} MW")
-st.write(f"**Thrust Available (Interpolated)**: {TA:.1f} N")
-st.write(f"**Power Available (Interpolated)**: {PA/1e6:.2f} MW")
-st.write(f"**Excess Thrust**: {excess_thrust:.1f} N")
-st.write(f"**Excess Power**: {excess_power/1e6:.2f} MW")
+# How much extra thrust you got left over for climbing or speeding up
+excess_thrust_n = thrust_avail_n - thrust_req_n
+
+# Leftover power for getting places faster or higher
+excess_power_w = power_avail_w - power_req_w
+
+
+# --- Output Results ---
+st.subheader("Calculated Numbers")
+st.write("Here's the lowdown based on what you told me.")
+
+st.write(f"Air Density up at {alt_m:.1f} m: **{rho:.3f}** kg/m³")
+st.write(f"Wing 'Footprint' Area (S): **{wing_area:.2f}** m²")
+st.write(f"Air-Smacking Force (Dynamic Pressure, q): **{q:.2f}** Pa")
+
+st.subheader("Thrust & Power Situation")
+
+# Display the key stuff using some fancy boxes
+colA, colB, colC = st.columns(3)
+
+with colA:
+    st.metric("Thrust Required (Tr)", f"{thrust_req_n:.2f} N")
+    st.metric("Power Required (Pr)", f"{power_req_w:.2f} W")
+
+with colB:
+    st.metric("Thrust Available (Ta)", f"{thrust_avail_n:.2f} N")
+    st.metric("Power Available (Pa)", f"{power_avail_w:.2f} W")
+
+with colC:
+    st.metric("Excess Thrust (Te)", f"{excess_thrust_n:.2f} N")
+    st.metric("Excess Power (Pe)", f"{excess_power_w:.2f} W")
+
+
+st.subheader("Lift vs. Weight Check")
+st.write("So, is this thing flying level or not?")
+st.write(f"What the wings are putting out (Lift): **{lift_n:.2f}** N")
+st.write(f"What the plane weighs (Weight): **{weight_n:.2f}** N")
+
+# Check if Lift is close to Weight (within 1%)
+# Don't divide by zero if somehow weight is zero
+lift_weight_diff_pct = abs(lift_n - weight_n) / weight_n * 100 if weight_n > 0 else float('inf')
+
+if lift_weight_diff_pct < 1.0: # Close enough for government work
+    st.info("Calculated Lift is pretty much equal to Weight. Looks like steady, level flight.")
+elif lift_n > weight_n:
+    st.warning("Calculated Lift is more than Weight. This bird is pulling up or climbing.")
+else:
+    st.warning("Calculated Lift is less than Weight. Uh oh, it's headed down or descending.")
+
+st.caption("Heads up: The Thrust/Power required numbers are based on the drag calculated at the CL/CD you gave me, not necessarily the exact thrust needed to perfectly balance forces if Lift isn't equal to Weight.")
