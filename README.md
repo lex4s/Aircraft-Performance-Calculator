@@ -21,7 +21,7 @@ This project precisely computes key aircraft performance parameters, factoring i
 - **Induced Drag Coefficient (C_D_induced)**
 - **Parasite Drag Coefficient (C_D_parasite)**
 - **Total Drag Coefficient (C_D)**
-
+   
 It uses **polynomial fitting** to estimate Parasite Drag Coefficient as a function of altitude based on empirical chart data, offering refined accuracy across varying altitudes.
 
 ---
