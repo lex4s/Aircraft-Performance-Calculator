@@ -10,7 +10,7 @@ An interactive and accurate web application for calculating essential aircraft p
 ## 📖 Overview
 
 This project precisely computes key aircraft performance parameters, factoring in real-time user inputs for **True Airspeed**, **Weight**, **Wing Span**, **Aspect Ratio**, and **Oswald Efficiency Factor**. It dynamically evaluates:
-   
+      
 - **Thrust Available (N)**
 - **Thrust Required (N)**
 - **Excess Thrust (N)**
